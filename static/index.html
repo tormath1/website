@@ -1,0 +1,76 @@
+<!doctype html>
+
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+
+  <title>tormath1</title>
+
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.22.0/themes/prism-tomorrow.min.css" integrity="sha512-vswe+cgvic/XBoF1OcM/TeJ2FW0OofqAVdCZiEYkd6dwGXthvkSFWOoGGJgS2CW70VK5dQM5Oh+7ne47s74VTg==" crossorigin="anonymous" />
+</head>
+
+<body>
+
+<h1>Table of content</h1>
+
+<ul>
+  <li><a href="#blog">Blog</a></li>
+  <ul>
+    <li><a href="#playing-with-terraform-state">Playing with Terraform State</a></li>
+  </ul>
+  <li><a href="#links">Links</a></li>
+</ul>
+
+<h1 id="blog">Blog</h1>
+
+<h2 id="playing-with-terraform-state">Playing with Terraform state - 26/12/20</h2>
+
+To currently host this website, I use a GCP Load Balancer with a bucket as backend behind. The infrastructure is done <i>as code</i> with Terraform. I have some issues while creating the bucket using TF (domain name issues), so I used the GCP Console in order to create the bucket. Once done, I used <a href="https://github.com/cycloidio/terracognita">Terracognita</a>, a reverse Terraform in order to generate my HCL config and my Terraform state (TFState).
+
+Everything went well, except that I fetched two other buckets and I was not interested to add them to this Terraform context. Using `terraform state` and its subcommands, I've been able to simply remove TF resources from the tfstate (without manual edition):
+
+<pre><code class="language-bash">
+$ terraform state --help
+Usage: terraform state <subcommand> [options] [args]
+
+  This command has subcommands for advanced state management.
+
+  These subcommands can be used to slice and dice the Terraform state.
+  This is sometimes necessary in advanced cases. For your safety, all
+  state management commands that modify the state create a timestamped
+  backup of the state prior to making modifications.
+
+  The structure and output of the commands is specifically tailored to work
+  well with the common Unix utilities such as grep, awk, etc. We recommend
+  using those tools to perform more advanced state tasks.
+
+Subcommands:
+    list                List resources in the state
+    mv                  Move an item in the state
+    pull                Pull current state and output to stdout
+    push                Update remote state from a local state file
+    replace-provider    Replace provider in the state
+    rm                  Remove instances from the state
+    show                Show a resource in the state
+$ terraform state rm google_storage_bucket.bfBqD
+$ terraform state rm google_storage_bucket.SZMzR
+</code></pre>
+
+Then, I wanted to rename one of my resource:
+<pre><code class="language-bash">
+$ terraform state mv google_storage_bucket.xeFOT google_storage_bucket.static
+</code></pre>
+
+<h1 id="links">Links</h1>
+<ul>
+  <li><a href="https://github.com/tormath1">https://github.com/tormath1</a>
+  <li><a href="https://twitter.com/tormath1">https://twitter.com/tormath1</a>
+  <li><a href="https://www.linkedin.com/in/mathieu-tortuyaux-3b711b115/">https://www.linkedin.com/in/mathieu-tortuyaux-3b711b115/</a>
+  <li><a href="https://tormath1.fr/resume.pdf">resume</a>
+</ul>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.22.0/components/prism-core.min.js" integrity="sha512-hqRrGU7ys5tkcqxx5FIZTBb7PkO2o3mU6U5+qB9b55kgMlBUT4J2wPwQfMCxeJW1fC8pBxuatxoH//z0FInhrA==" crossorigin="anonymous"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.22.0/plugins/autoloader/prism-autoloader.min.js" integrity="sha512-Q3qGP1uJL/B0sEmu57PKXjCirgPKMbg73OLRbTJ6lfHCVU5zkHqmcTI5EV2fSoPV1MHdKsCBE7m/aS6q0pPjRQ==" crossorigin="anonymous"></script>
+
+</body>
+</html>
