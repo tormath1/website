@@ -1,0 +1,24 @@
+name: Github Website Deployment
+
+on:
+  push:
+    branches: [ master ]
+  pull_request:
+    branches: [ master ]
+
+jobs:
+  build:
+
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v2
+    - name: Cloud Storage Uploader
+      uses: google-github-actions/upload-cloud-storage@v0.2.0
+      with:
+        credentials: ${{ secrets.GOOGLE_CREDENTIALS }}
+        # we need to specify the file we want to upload
+        # because folder will create a folder with the same name
+        # https://github.com/google-github-actions/upload-cloud-storage/issues/11
+        path: ${{ github.workspace }}/static/index.html
+        destination: ${{ secrets.BUCKET_NAME }}
