@@ -16,12 +16,40 @@
 <ul>
   <li><a href="#blog">Blog</a></li>
   <ul>
+    <li><a href="#screensharing-on-wayland">Screensharing on Wayland</a></li>
     <li><a href="#playing-with-terraform-state">Playing with Terraform State</a></li>
   </ul>
   <li><a href="#links">Links</a></li>
 </ul>
 
 <h1 id="blog">Blog</h1>
+
+<h2 id="screensharing-on-wayland">Screensharing on Wayland - 31/12/20</h2>
+
+As a remote software engineer, video call is an essential requirement to work. When I moved from X11 to <a href="https://wayland.freedesktop.org/">Wayland</a>, Google Meet usage without any issues was mandatory: audio and video are not directly linked to Wayland, so no issue with them but screensharing is another thing. Basically to share a screen, you rely on X11 components so your browser / software must implements Wayland protocol in order to work in a non-X11 environment.
+<br><br>
+
+Here a couple of elements to keep in mind:
+  <ul>
+    <li>Install dbus with <code class="language-none">user-session</code> supports in order to have a session scoped dbus daemon
+    <li>Compile Firefox with <code class="language-none">screencast</code> support to be able to use pipewire
+    <li>Install (and start/enable) <code class="language-none">xdg-desktop-portal</code> with <code class="language-none">screencast</code> support
+    <li>Install <code class="language-none">xdg-desktop-portal-wlr</code> for the wlroots XDG backend implementation
+  </ul>
+
+Now, the funny things:
+
+  <ul>
+    <li>Xwayland needs to be enabled, if not firefox will segfault
+    <li>My whole system runs with <code class="language-none">libressl</code> instead of openssl (<a href="https://www.libressl.org/goals.html">https://www.libressl.org/goals.html</a>). NodeJS <a href="https://github.com/nodejs/node/issues/428">does not support yet libressl</a>, so you must compile NodeJS with the bundled SSL
+  </ul>
+
+Useful links:
+  <ul>
+    <li><a href="https://github.com/emersion/xdg-desktop-portal-wlr/wiki/Screencast-Compatibility">https://github.com/emersion/xdg-desktop-portal-wlr/wiki/Screencast-Compatibility</a>
+    <li><a href="https://mozilla.github.io/webrtc-landing/">https://mozilla.github.io/webrtc-landing/</a>
+    <li><a href="https://wiki.gentoo.org/wiki/Firefox">https://wiki.gentoo.org/wiki/Firefox</a>
+  </ul>
 
 <h2 id="playing-with-terraform-state">Playing with Terraform state - 26/12/20</h2>
 
