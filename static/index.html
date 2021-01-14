@@ -51,6 +51,27 @@ Useful links:
     <li><a href="https://wiki.gentoo.org/wiki/Firefox">https://wiki.gentoo.org/wiki/Firefox</a>
   </ul>
 
+<h3><i>Update - 14/01/20</i></h3>
+
+So far, so good: no issue with screensharing on Firefox. I got one blocking point: Microsoft Teams. It happens that usage of Teams is required and it's currently impossible to attend to a Teams meeting using Firefox browser... Chromium is required.
+
+Chromium wayland support for screencast is pretty new / unstable. Actually, the version I want is <a href="https://packages.gentoo.org/packages/www-client/chromium">masked</a> but I need this one because: 
+
+<pre><code class="language-bash">
+wayland? (
+	dev-libs/wayland:=
+	dev-libs/libffi:=
+	screencast? ( media-video/pipewire:0/0.3 )
+	x11-libs/gtk+:3[wayland,X]
+	x11-libs/libdrm:=
+	x11-libs/libxkbcommon:=
+)
+</code></pre>
+
+As we can see, screencast requires pipewire-0.3. YES, it's a good thing, I was afraid to have only supports for pipewire-0.2. Which would be blocking for the Firefox installation...
+
+After a <i>few</i> hours of compilation, Chromium is installed. The last thing to do is to add <code class="language-none">--enable-webrtc-pipewire-capturer</code> into <code class="language-none">/etc/chromium/default</code>.
+
 <h2 id="playing-with-terraform-state">Playing with Terraform state - 26/12/20</h2>
 
 To currently host this website, I use a GCP Load Balancer with a bucket as backend behind. The infrastructure is done <i>as code</i> with Terraform. I have some issues while creating the bucket using TF (domain name issues), so I used the GCP Console in order to create the bucket. Once done, I used <a href="https://github.com/cycloidio/terracognita">Terracognita</a>, a reverse Terraform in order to generate my HCL config and my Terraform state (TFState).
