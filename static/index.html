@@ -16,6 +16,7 @@
 <ul>
   <li><a href="#blog">Blog</a></li>
   <ul>
+    <li><a href="#use-docker-compose-with-podman">Use docker-compose with Podman</a></li>
     <li><a href="#screensharing-on-wayland">Screensharing on Wayland</a></li>
     <li><a href="#playing-with-terraform-state">Playing with Terraform State</a></li>
   </ul>
@@ -23,6 +24,68 @@
 </ul>
 
 <h1 id="blog">Blog</h1>
+
+<h2 id="use-docker-compose-with-podman">Use docker-compose with Podman - 19/01/20</h2>
+
+From version 3.0, Podman <a href="https://www.redhat.com/sysadmin/podman-docker-compose">seems</a> fully compatible with Docker-Compose. I was curious to try it on the current version I have (2.2.1). Here's what I found !
+<br>
+We first need to activate the systemd unit provided by Podman:
+<pre><code class="language-bash">
+$ equery f libpod | grep service
+/usr/lib/systemd/system/podman-auto-update.service
+/usr/lib/systemd/system/podman.service
+/usr/lib/systemd/user/podman-auto-update.service
+/usr/lib/systemd/user/podman.service
+/usr/share/man/man1/podman-system-service.1.bz2
+$ sudo systemctl start podman.service
+</code></pre>
+
+It will create a unix Socket listening on <code class="language-none">%t/podman/podman.sock</code>.
+
+Let's create a dummy docker-compose spec:
+
+<pre><code class="language-yaml">
+version: '3.7'
+services:
+  app:
+    image: docker.io/alpine
+    command: ["sleep", "60s"]
+</code></pre>
+
+I'm going to naively run everything:
+
+<pre><code class="language-bash">
+$ sudo DOCKER_HOST="unix:///run/podman/podman.sock" docker-compose up
+Creating network "tmp_default" with the default driver
+Creating tmp_app_1 ... error
+
+ERROR: for tmp_app_1  cannot disconnect container 489f636118ca696ec03a6188fe8e027b56c1d1f1c9b04180a913a6ad603ff5b5 from networks as it is not running: container state improper
+
+ERROR: for app  cannot disconnect container 489f636118ca696ec03a6188fe8e027b56c1d1f1c9b04180a913a6ad603ff5b5 from networks as it is not running: container state improper
+ERROR: Encountered errors while bringing up the project.
+</code></pre>
+
+Oops, it seems the limitation of the current support of Docker-Compose on Podman 2.2.1 is reached. Let's try to manually start the container:
+
+<pre><code class="language-bash">
+$ sudo DOCKER_HOST="unix:///run/podman/podman.sock" docker-compose up --no-start
+Creating network "tmp_default" with the default driver
+Creating tmp_app_1 ... done
+$ sudo podman ps -a
+CONTAINER ID  IMAGE                            COMMAND    CREATED         STATUS   PORTS   NAMES
+ed221fc06d6f  docker.io/library/alpine:latest  sleep 60s  46 seconds ago  Created          tmp_app_1
+$ sudo podman start tmp_app_1
+tmp_app_1
+$ sudo podman exec -ti ed221fc06d6f ping google.com
+PING google.com (216.58.213.78): 56 data bytes
+64 bytes from 216.58.213.78: seq=0 ttl=113 time=2.952 ms
+64 bytes from 216.58.213.78: seq=1 ttl=113 time=22.398 ms
+64 bytes from 216.58.213.78: seq=2 ttl=113 time=7.604 ms
+64 bytes from 216.58.213.78: seq=3 ttl=113 time=3.135 ms
+...
+</code></pre>
+
+It works fine with the needs I have. It's enough to wait for the official release of Podman 3.0.0 on Gentoo ! 
 
 <h2 id="screensharing-on-wayland">Screensharing on Wayland - 31/12/20</h2>
 
