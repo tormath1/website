@@ -6,6 +6,19 @@
 
   <title>tormath1</title>
 
+  <meta property="og:title" content="tormath1" />
+  <meta property="og:site_name" content="tormath1" />
+  <meta property="og:description" content="a collection of shared notes about IT" />
+  <meta property="og:type" content="website" />
+  <meta property="og:url" content="https://tormath1.fr" />
+  <meta property="og:image" content="https://avatars.githubusercontent.com/u/28657343?s=400&u=fc529eca241f435ad3f4ef065cd9a321cc1e1aef&v=4" />
+  <meta property="og:image:height" content="238" />
+  <meta property="og:image:width" content="238" />
+  <meta property="twitter:card" content="summary" />
+  <meta property="twitter:site" content="@tormath1" />
+  <meta property="twitter:image" content="https://avatars.githubusercontent.com/u/28657343?s=400&u=fc529eca241f435ad3f4ef065cd9a321cc1e1aef&v=4" />
+
+
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.22.0/themes/prism-tomorrow.min.css" integrity="sha512-vswe+cgvic/XBoF1OcM/TeJ2FW0OofqAVdCZiEYkd6dwGXthvkSFWOoGGJgS2CW70VK5dQM5Oh+7ne47s74VTg==" crossorigin="anonymous" />
 </head>
 
@@ -16,6 +29,7 @@
 <ul>
   <li><a href="#blog">Blog</a></li>
   <ul>
+    <li><a href="#keychron-k6-linux">Setting Keychron K6 keyboard on Linux</a></li>
     <li><a href="#use-docker-compose-with-podman">Use docker-compose with Podman</a></li>
     <li><a href="#screensharing-on-wayland">Screensharing on Wayland</a></li>
     <li><a href="#playing-with-terraform-state">Playing with Terraform State</a></li>
@@ -24,6 +38,20 @@
 </ul>
 
 <h1 id="blog">Blog</h1>
+
+<h2 id="keychron-k6-linux">Setting Keychron K6 Keyboard on Linux</h2>
+
+I recently acquired a Keychron <a href="https://www.keychron.com/products/keychron-k6-wireless-mechanical-keyboard">K6</a> mechanical keyboard. Linux compatibility is pretty good, it really works out-of-the-box.
+As I'm french, it was required to have the accents and the cedilla. Below, the associated Sway configuration (it uses standard xkb options, it should be the same on X11 environments):
+<pre><code class="language-bash">
+input "type:keyboard" {
+  xkb_layout us
+  xkb_variant intl
+}
+</code></pre>
+
+For the cedilla, it was more tricky, it's not a dead key: it's natively present on the keyboard, on the '.' key. It requires the usage of the "Alt right" key, for this K6 must be in "Windows" mode. Happy typing !
+Ça fonctionne très bien !
 
 <h2 id="use-docker-compose-with-podman">Use docker-compose with Podman - 19/01/21</h2>
 
