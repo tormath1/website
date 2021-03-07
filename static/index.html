@@ -28,6 +28,7 @@
 <ul>
   <li><a href="#blog">Blog</a></li>
   <ul>
+    <li><a href="#display-keychron-k6-battery-level">Display Keychron K6 battery level</a></li>
     <li><a href="#keychron-k6-linux">Setting Keychron K6 keyboard on Linux</a></li>
     <li><a href="#use-docker-compose-with-podman">Use docker-compose with Podman</a></li>
     <li><a href="#screensharing-on-wayland">Screensharing on Wayland</a></li>
@@ -37,6 +38,49 @@
 </ul>
 
 <h1 id="blog">Blog</h1>
+
+<h2 id="display-keychron-k6-battery-level">Display Keychron K6 battery level</h2>
+
+I always been doubtful about bluetooth devices: mouse, keyboards, headphones, etc. I do not feel the need to have a wireless mouse or a wireless keyboard but I feel the need to test ! I set up the bluetooth stack and successfully connected Keychron K6 to the computer.
+
+On Gentoo, Bluetooth stack works out of the box (assuming you have the right kernel tuning), it requires this option in order to work with HID:
+
+<pre><code class="language-ini">
+/etc/bluetooth/input.conf
+[General]
+# Enable HID protocol handling in userspace input profile
+# Defaults to false (HIDP handled in HIDP kernel module)
+UserspaceHID=true
+</code></pre>
+
+Keyboard seems to have quite a long autonomy but like every device running with a battery: it's always better to know the charge level. After a quick search, I found out that using <code class="language-none">dbus</code> I should be able to request the percentage of remaining battery.
+
+Browsing a bit, we can see that <code class="language-none">org.bluez</code> has a dedicated interface: <code class="language-none">org.bluez.Battery1</code> with a <code class="language-none">Percentage</code> property, it should make the job.
+
+After some introspection on this interface using the object <code class="language-none">/org/bluez/hci0/dev_DC_2C...</code> where 'DC_2C...' is the mac address of the device, I was not able to find this <code class="language-none">Percentage</code> property.
+
+<br/>
+
+UPower to the rescue ! This software has its own implementation to dial with HID and the daemon exposes some interfaces through D-Bus interface, which is enough to get keyboard's charge level.
+
+<pre><code class="language-bash">
+dbus-send \
+	--print-reply=literal --system \
+	--dest=org.freedesktop.UPower \
+	/org/freedesktop/UPower/devices/keyboard_hid_dc2c..._battery \
+	org.freedesktop.DBus.Properties.Get \
+	string:org.freedesktop.UPower.Device string:"Percentage" | awk '{print $3}')
+</code></pre>
+
+Finally, a custom widget has been added to my Waybar in order to display the charge with a nice icon:
+
+<blockquote class="twitter-tweet"><p lang="en" dir="ltr">Some experiments with &#39;dbus&#39; in order to be able to fetch the current charging level of my k6 keyboard (bluetooth mode) :)<br>percentage is displayed on the left of the bar. I&#39;ll certainly write a couple of lines about it ! <a href="https://t.co/kSCqQ5zpPQ">pic.twitter.com/kSCqQ5zpPQ</a></p>&mdash; Mathieu Tortuyaux (@tormath1) <a href="https://twitter.com/tormath1/status/1367235776321314823?ref_src=twsrc%5Etfw">March 3, 2021</a></blockquote> <script async src="https://platform.twitter.com/widgets.js" charset="utf-8"></script>
+
+Useful links:
+  <ul>
+    <li><a href="https://cgit.freedesktop.org/upower/tree/dbus/org.freedesktop.UPower.Device.xml">https://cgit.freedesktop.org/upower/tree/dbus/org.freedesktop.UPower.Device.xml</a>
+    <li><a href="https://git.kernel.org/pub/scm/bluetooth/bluez.git/tree/doc/battery-api.txt">https://git.kernel.org/pub/scm/bluetooth/bluez.git/tree/doc/battery-api.txt</a>
+  </ul>
 
 <h2 id="keychron-k6-linux">Setting Keychron K6 Keyboard on Linux</h2>
 
