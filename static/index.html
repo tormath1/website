@@ -19,9 +19,12 @@
   <meta property="twitter:image" content="https://avatars.githubusercontent.com/u/28657343?s=400&u=fc529eca241f435ad3f4ef065cd9a321cc1e1aef&v=4" />
 
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.22.0/themes/prism-tomorrow.min.css" integrity="sha512-vswe+cgvic/XBoF1OcM/TeJ2FW0OofqAVdCZiEYkd6dwGXthvkSFWOoGGJgS2CW70VK5dQM5Oh+7ne47s74VTg==" crossorigin="anonymous" />
+  <link id="theme" rel="stylesheet" type="text/css" href="css/light.css" />
 </head>
 
 <body>
+
+<button id="dark-toggle">Switch to dark mode</button>
 
 <h1>Table of content</h1>
 
@@ -266,6 +269,22 @@ $ terraform state mv google_storage_bucket.xeFOT google_storage_bucket.static
     "name": "Mathieu Tortuyaux",
     "url": "https://tormath1.fr"
   }
+  </script>
+
+  <script>
+      document.addEventListener('DOMContentLoaded', () => {
+	      const button = document.getElementById('dark-toggle');
+	      const theme = document.getElementById('theme');
+	      button.addEventListener('click', () => {
+		if(theme.href.includes('light')){
+			theme.href = "css/dark.css";
+			button.innerText = "Switch to light mode";
+		} else {
+			theme.href = "css/light.css";
+			button.innerText = "Switch to dark mode";
+		}
+	      })
+      })
   </script>
 
 </body>
